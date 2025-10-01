@@ -1,33 +1,29 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from datetime import datetime, timedelta
-from scripts.hello import say_hello   # import your function
+from datetime import datetime
+import sys
+import os
 
-# Default arguments for DAG
+# Add repo root (so scripts/ can be imported)
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
+from scripts.hello import say_hello
+
+
 default_args = {
-    'owner': 'airflow',
-    'depends_on_past': False,
-    'email_on_failure': False,
-    'email_on_retry': False,
-    'retries': 1,
-    'retry_delay': timedelta(minutes=5),
+    "owner": "airflow",
+    "retries": 1,
 }
 
-# Define DAG
 with DAG(
     dag_id="hello_world_dag",
     default_args=default_args,
-    description="A simple Hello World DAG",
-    schedule_interval="@daily",   # runs once a day
-    start_date=datetime(2025, 1, 1),
+    start_date=datetime(2023, 1, 1),
+    schedule_interval="@once",
     catchup=False,
-    tags=["example"],
 ) as dag:
 
-    # Define Python task
     task1 = PythonOperator(
-        task_id="print_hello",
-        python_callable=say_hello
+        task_id="say_hello",
+        python_callable=say_hello,
     )
-
-    task1
