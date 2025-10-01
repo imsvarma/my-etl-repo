@@ -2,24 +2,26 @@ name: CI/CD for Airflow
 
 on:
   push:
+    branches: [ "main" ]   # runs every time you push to main
+  pull_request:
     branches: [ "main" ]
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-    - name: Log in to DockerHub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Build Airflow Image
-      run: docker build -t my-dockerhub-user/my-airflow:latest .
+      - name: Build Docker image
+        run: docker build -t avkmanikanta/airflow:latest .
 
-    - name: Push Image to DockerHub
-      run: docker push my-dockerhub-user/my-airflow:latest
+      - name: Push Docker image
+        run: docker push avkmanikanta/airflow:latest
